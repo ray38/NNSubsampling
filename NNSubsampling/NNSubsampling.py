@@ -229,7 +229,7 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
     return overall_keep_list
 
     
-def subsampling_system(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
+def subsampling(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
                        method = "pykdtree", verbose = True):
     
     '''
@@ -279,7 +279,7 @@ def subsampling_system(data, list_desc = [], standard_scale = True, cutoff_sig =
 
 
 
-def subsampling_system_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
+def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
                                 start_trial_component = 10, max_component = 30, target_variance = 0.999999, \
                                 method = "pykdtree", verbose = True):
     
@@ -379,7 +379,7 @@ def subsampling_system_with_PCA(data, list_desc = [], standard_scale = True, cut
     return sampling_result 
 
 
-def subsampling_system_batch(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
+def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
                              verbose = True, shuffle = True):
     
@@ -463,7 +463,7 @@ def subsampling_system_batch(data, list_desc = [], batch_size = 1000000, recursi
                                  rate = rate, method = method, verbose = verbose)
     return sampling_result
 
-def subsampling_system_with_PCA_batch(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
+def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              start_trial_component = 10, max_component = 30, target_variance = 0.999999, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
                              verbose = True, shuffle = True):

@@ -273,8 +273,7 @@ def subsampling(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, 
         data_process = get_data_process(data, list_desc)
     
     overall_keep_list = get_subsampling_index2(data_process, standard_scale = standard_scale, \
-                                               cutoff_sig = cutoff_sig, rate = rate, method = method, \
-                                               verbose = verbose)
+                                               cutoff_sig = cutoff_sig, method = method, verbose = verbose)
     sampling_result = [data[i] for i in overall_keep_list]
     return sampling_result    
 
@@ -439,10 +438,10 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
     sampling_result = []
     
     if shuffle:
-        random.shuffle(data)
+        data = random.shuffle(data)
         
     for data_subgroup in chunker(data, batch_size):
-        temp_sampling_result = subsampling(data_subgroup, list_desc = [], standard_scale = standard_scale, \
+        temp_sampling_result = subsampling_system(data_subgroup, list_desc = [], standard_scale = standard_scale, \
                                                   cutoff_sig = cutoff_sig, rate = rate, method = method, \
                                                   verbose = verbose)
         sampling_result += temp_sampling_result
@@ -451,14 +450,14 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
     
     if recursive_level == 1:
         print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
-        sampling_result = subsampling(sampling_result, list_desc = [], standard_scale = standard_scale, \
+        sampling_result = subsampling_system(sampling_result, list_desc = [], standard_scale = standard_scale, \
                           cutoff_sig = cutoff_sig, rate = rate, method = method, \
                           verbose = verbose)
 
         
     else:
         print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
-        sampling_result = batch_subsampling(sampling_result, list_desc = [], batch_size = batch_size, \
+        sampling_result = subsampling_system_batch(sampling_result, list_desc = [], batch_size = batch_size, \
                                  recursive_level = recursive_level-1, \
                                  standard_scale = standard_scale, cutoff_sig = cutoff_sig, \
                                  rate = rate, method = method, verbose = verbose)
@@ -532,10 +531,10 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
     sampling_result = []
     
     if shuffle:
-        random.shuffle(data)
+        data = random.shuffle(data)
         
     for data_subgroup in chunker(data, batch_size):
-        temp_sampling_result = subsampling_with_PCA(data_subgroup, list_desc = [], standard_scale = standard_scale, \
+        temp_sampling_result = subsampling_system_with_PCA(data_subgroup, list_desc = [], standard_scale = standard_scale, \
                                   start_trial_component = start_trial_component, max_component = max_component, \
                                   target_variance = target_variance, cutoff_sig = cutoff_sig, rate = rate, \
                                   method = method, verbose = verbose)
@@ -543,7 +542,7 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
     
     if recursive_level == 1:
         print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
-        sampling_result = subsampling_with_PCA(sampling_result, list_desc = [], standard_scale = standard_scale, \
+        sampling_result = subsampling_system_with_PCA(sampling_result, list_desc = [], standard_scale = standard_scale, \
                                   start_trial_component = start_trial_component, max_component = max_component, \
                                   target_variance = target_variance, cutoff_sig = cutoff_sig, rate = rate, \
                                   method = method, verbose = verbose)
@@ -552,7 +551,7 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
         
     else:
         print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
-        sampling_result = batch_subsampling_with_PCA(sampling_result, list_desc = [], batch_size = batch_size, \
+        sampling_result = subsampling_system_with_PCA_batch(sampling_result, list_desc = [], batch_size = batch_size, \
                                  start_trial_component = start_trial_component, max_component = max_component, \
                                  target_variance = target_variance, recursive_level = recursive_level-1, \
                                  standard_scale = standard_scale, cutoff_sig = cutoff_sig, \

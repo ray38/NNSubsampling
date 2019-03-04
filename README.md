@@ -16,12 +16,17 @@ High-dimensional datasets may also be pre-processed by principal component analy
 
 ### For more detailed explanation of the code and some tests, please find the jupyter notebook "NNSubsampling_Explaination_and_Test.ipynb" under "./Tutorial"
 
+# Install
+
+please clone this repo, and run "pip install ." to install this package
 
 # Dependencies
 
 * Python 2 or Python 3
 
-* scikit-
+* numpy 
+
+* scikit-learn
 
 * [pykdtree](https://github.com/storpipfugl/pykdtree) (optional, recommended)
 

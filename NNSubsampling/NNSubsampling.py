@@ -393,7 +393,7 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
 
 def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
-                             verbose = 1, shuffle = True, final_overall = True):
+                             verbose = 1, shuffle = True, final_overall_subssample = True):
     
     '''
     Subsample with batch
@@ -437,7 +437,9 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
     verbose [1]: integer. level of verbosity
     
     shuffle [True]: Boolean. whether to shuffle the dataset before breaking down into batchs
-    
+ 
+    final_overall_subssample [True]: wheter to perform a overall subsample after the levels of batch
+                                     subsample are finished   
     
     Return
     -------------
@@ -481,7 +483,7 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
 def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              start_trial_component = 10, max_component = 30, target_variance = 0.999999, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
-                             verbose = 1, shuffle = True, final_overall = True):
+                             verbose = 1, shuffle = True, final_overall_subssample = True):
     
     '''
     Subsample with batch (with PCA pre-processing)
@@ -533,7 +535,9 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
     verbose [1]: integer. level of verbosity
     
     shuffle [True]: Boolean. whether to shuffle the dataset before breaking down into batchs
-    
+
+    final_overall_subssample [True]: wheter to perform a overall subsample after the levels of batch
+                                     subsample are finished
     
     Return
     -------------

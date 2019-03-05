@@ -73,7 +73,7 @@ subsample based on kD-tree
 
 
 def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.02, rate = 0.3, \
-                           method = "pykdtree", verbose = True):
+                           method = "pykdtree", verbose = 1):
     
     """
     Using Nearest-Neighbor search based algorithm, find the list of indices of the subsampled dataset
@@ -93,7 +93,7 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
     method ["pykdtree"]: String. which backend nearest neighbour model to use. 
                          possible choices: ["pykdtree", "nmslib", "sklearn", "scipy", "annoy", "flann"]
     
-    verbose [True]: Boolean. whether to output result of each iteration
+    verbose [1]: integer. level of verbosity
     
     
     Return
@@ -104,36 +104,42 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
     
     
     
-    
-    print("Started NN-subsampling, original length: {}".format(len(data_process)))
+    if verbose >=1:
+    	print("Started NN-subsampling, original length: {}".format(len(data_process)))
     
     method = method.lower()
     start = time.time()
     
     
     if method == "flann":
-        print("use flann backend")
+        if verbose >=1:
+            print("use flann backend")
     elif method == "pykdtree":
-        print("use pykdtree backend")
+        if verbose >=1:
+            print("use pykdtree backend")
     elif method == "sklearn":
-        print("use slearn nearest neighbors backend")
+        if verbose >=1:
+            print("use slearn nearest neighbors backend")
     elif method == "scipy":
-        print("use scipy cKDTree backend")
+        if verbose >=1:
+            print("use scipy cKDTree backend")
     elif method == "annoy":
-        print("use annoy backend")
+        if verbose >=1:
+            print("use annoy backend")
     elif method == "nmslib":
-        print("use nmslib backend")
+        if verbose >=1:
+	    print("use nmslib backend")
     else:
         print("method {} not impletemented".format(method))
         raise NotImplemented
     
     # apply standard scaling 
     if standard_scale:
-        if verbose:
+        if verbose >= 2:
             print("Subample with standard scaled data")
         data_process = StandardScaler().fit_transform(np.asarray(data_process).copy())
     else:
-        if verbose:
+        if verbose >= 2:
             print("Subample with original data")
         data_process = np.asarray(data_process).copy()
     
@@ -151,9 +157,10 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
     overall_keep_list = np.arange(len(data_process)).tolist() 
     
     keep_going = True
+    iter_count = 1
     while keep_going:
-        if verbose:
-            print('start total length: {}'.format(len(overall_keep_list)))
+        if verbose >= 2:
+            print('start iteration {}, total length: {}'.format(iter_count, len(overall_keep_list)))
         start_cycle = time.time()
         temp_data_process = get_array_based_on_index(data_process.copy(), overall_keep_list)
         
@@ -185,7 +192,7 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
         elif method == "nmslib":
             index = nmslib.init(method='hnsw', space='l2')
             index.addDataPointBatch(temp_data_process)
-            index.createIndex( print_progress=True)
+            index.createIndex( print_progress=False)
 
             neighbours = index.knnQueryBatch(temp_data_process, k=2) 
             
@@ -222,15 +229,17 @@ def get_subsampling_index2(data_process, standard_scale = True, cutoff_sig = 0.0
         
         temp_keep_list = remove_list_from_list(index_li, remove_index_li)
         overall_keep_list = [overall_keep_list[i] for i in temp_keep_list ]
-        if verbose:
-            print('end cycle. length: {}\t time:{}'.format(len(overall_keep_list), time.time()-start_cycle))
-       
-    print('end subsampling. length: {}\t time:{}'.format(len(overall_keep_list), time.time()-start))
+        if verbose >= 2:
+            print('end iteration {}. length: {}\t time:{}'.format(iter_count, len(overall_keep_list), time.time()-start_cycle))
+        iter_count += 1
+    
+    if verbose >= 1:
+    	print('end NN-subsampling. length: {}\t time:{}'.format(len(overall_keep_list), time.time()-start))
     return overall_keep_list
 
     
 def subsampling(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
-                       method = "pykdtree", verbose = True):
+                       method = "pykdtree", verbose = 1):
     
     '''
     Run the NN-based subsampling algorithm to a list of data points and 
@@ -257,7 +266,7 @@ def subsampling(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, 
     method ["pykdtree"]: String. which backend nearest neighbour model to use. 
                          possible choices: ["pykdtree", "nmslib", "sklearn", "scipy", "annoy", "flann"]
     
-    verbose [True]: Boolean. whether to output result of each iteration
+    verbose [1]: integer. level of verbosity
     
     
     Return
@@ -282,7 +291,7 @@ def subsampling(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, 
 
 def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig = 0.05, rate = 0.3, \
                                 start_trial_component = 10, max_component = 30, target_variance = 0.999999, \
-                                method = "pykdtree", verbose = True):
+                                method = "pykdtree", verbose = 1):
     
     '''
     Run the NN-based subsampling algorithm to a list of data points and 
@@ -324,7 +333,7 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
     method ["pykdtree"]: String. which backend nearest neighbour model to use. 
                          possible choices: ["pykdtree", "nmslib", "sklearn", "scipy", "annoy", "flann"]
     
-    verbose [True]: Boolean. whether to output result of each iteration
+    verbose [1]: integer. level of verbosity
     
     
     Return
@@ -339,7 +348,8 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
     else:
         data_process = get_data_process(data, list_desc)
     
-    print('start trial PCA')
+    if verbose >= 1:
+        print('start trial PCA')
     start = time.time()
     pca = PCA( svd_solver = "randomized" )
     data_pca = pca.fit_transform(data)
@@ -352,7 +362,7 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
         trial_component +=1
         sum_explained_variance = sum(explained_variance_ratio[:trial_component])
         
-        if verbose:
+        if verbose >= 2:
             print("trial components: {} \t explained variance: {}"\
                   .format(trial_component, sum_explained_variance))
         
@@ -361,15 +371,16 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
                
         if trial_component > max_component:
             keep_going = False
-            print("stopped PCA at {} components, total explained variance: {}"\
+            if verbose >= 2:
+                print("stopped PCA at {} components, total explained variance: {}"\
                   .format(trial_component, sum_explained_variance))
 
         if trial_component >= len(data_process[0]):
             keep_going = False
             pca_result = data_process
         
-        
-    print('end trial PCA, number of PC kept: {} \t took {} s'.format(trial_component,str(time.time()-start)))
+    if verbose >= 1:
+        print('end trial PCA, number of PC kept: {} \t took {} s'.format(trial_component,str(time.time()-start)))
     
     # pass the PCA transformed data to subsampling algorithm, and find the indices of data points to be kept
     overall_keep_list = get_subsampling_index2(data_pca[:,:trial_component], standard_scale = standard_scale, \
@@ -382,7 +393,7 @@ def subsampling_with_PCA(data, list_desc = [], standard_scale = True, cutoff_sig
 
 def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
-                             verbose = True, shuffle = True):
+                             verbose = 1, shuffle = True):
     
     '''
     Subsample with batch
@@ -423,7 +434,7 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
     method ["pykdtree"]: String. which backend nearest neighbour model to use. 
                          possible choices: ["pykdtree", "nmslib", "sklearn", "scipy", "annoy", "flann"]
     
-    verbose [True]: Boolean. whether to output result of each iteration
+    verbose [1]: integer. level of verbosity
     
     shuffle [True]: Boolean. whether to shuffle the dataset before breaking down into batchs
     
@@ -434,7 +445,8 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
     
     '''
     
-    print("at recursive level {}, length {}".format(recursive_level,len(data)))
+    if verbose >= 1:
+        print("\n\nat recursive level {}, length {}".format(recursive_level,len(data)))
     
     sampling_result = []
     
@@ -447,17 +459,18 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
                                                   verbose = verbose)
         sampling_result += temp_sampling_result
     
-    print(np.array(sampling_result).shape)
     
     if recursive_level == 1:
-        print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
+        if verbose >= 1:
+            print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
         sampling_result = subsampling(sampling_result, list_desc = [], standard_scale = standard_scale, \
                           cutoff_sig = cutoff_sig, rate = rate, method = method, \
                           verbose = verbose)
 
         
     else:
-        print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
+        if verbose >= 1:
+            print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
         sampling_result = batch_subsampling(sampling_result, list_desc = [], batch_size = batch_size, \
                                  recursive_level = recursive_level-1, \
                                  standard_scale = standard_scale, cutoff_sig = cutoff_sig, \
@@ -467,7 +480,7 @@ def batch_subsampling(data, list_desc = [], batch_size = 1000000, recursive_leve
 def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recursive_level = 1, \
                              start_trial_component = 10, max_component = 30, target_variance = 0.999999, \
                              standard_scale = True, cutoff_sig = 0.05, rate = 0.3, method = "pykdtree", \
-                             verbose = True, shuffle = True):
+                             verbose = 1, shuffle = True):
     
     '''
     Subsample with batch (with PCA pre-processing)
@@ -516,7 +529,7 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
     method ["pykdtree"]: String. which backend nearest neighbour model to use. 
                          possible choices: ["pykdtree", "nmslib", "sklearn", "scipy", "annoy", "flann"]
     
-    verbose [True]: Boolean. whether to output result of each iteration
+    verbose [1]: integer. level of verbosity
     
     shuffle [True]: Boolean. whether to shuffle the dataset before breaking down into batchs
     
@@ -526,7 +539,8 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
     sampling_result : the result list of subsampled data points
     
     '''
-    print("at recursive level {}, length {}".format(recursive_level,len(data)))
+    if verbose >= 1:
+        print("at recursive level {}, length {}".format(recursive_level,len(data)))
     
     
     sampling_result = []
@@ -542,7 +556,8 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
         sampling_result += temp_sampling_result
     
     if recursive_level == 1:
-        print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
+        if verbose >= 1:
+            print("at recursive level 1, length {}, Overall subsample".format(recursive_level,len(sampling_result)))
         sampling_result = subsampling_with_PCA(sampling_result, list_desc = [], standard_scale = standard_scale, \
                                   start_trial_component = start_trial_component, max_component = max_component, \
                                   target_variance = target_variance, cutoff_sig = cutoff_sig, rate = rate, \
@@ -551,7 +566,8 @@ def batch_subsampling_with_PCA(data, list_desc = [], batch_size = 1000000, recur
         
         
     else:
-        print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
+        if verbose >= 1:
+            print("end recursive level {}, length {}, Continue".format(recursive_level,len(sampling_result )))
         sampling_result = batch_subsampling_with_PCA(sampling_result, list_desc = [], batch_size = batch_size, \
                                  start_trial_component = start_trial_component, max_component = max_component, \
                                  target_variance = target_variance, recursive_level = recursive_level-1, \
